@@ -33,7 +33,7 @@ const Header = () => {
             <Link href={"/transaction/create"}>
               <Button className="flex items-center gap-2">
                 <PenBox size={18} />
-                <span className="hidden md:inline">Add Transactiono</span>
+                <span className="hidden md:inline">Add Transaction</span>
               </Button>
             </Link>
           </SignedIn>
