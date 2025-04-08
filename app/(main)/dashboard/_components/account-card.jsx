@@ -1,6 +1,6 @@
 "use client";
 
-import { updateDefaultAccount } from "@/actions/accounts";
+import { updateDefaultAccount } from "@/actions/account";
 import {
   Card,
   CardContent,
@@ -21,11 +21,11 @@ const AccountCard = ({ account }) => {
   const {
     loading: updateDefaultLoading,
     fn: updateDefaultFn,
-    data: updateAccount,
+    data: updatedAccount,
     error,
   } = useFetch(updateDefaultAccount);
 
-  const handleDefaultChange = async () => {
+  const handleDefaultChange = async (event) => {
     event.preventDefault();
 
     if (isDefault) {
@@ -37,10 +37,10 @@ const AccountCard = ({ account }) => {
   };
 
   useEffect(() => {
-    if (updateAccount?.success) {
+    if (updatedAccount?.success) {
       toast.success("Default account updated successfully");
     }
-  }, [updateAccount, updateDefaultLoading]);
+  }, [updatedAccount, updateDefaultLoading]);
 
   useEffect(() => {
     if (error) {

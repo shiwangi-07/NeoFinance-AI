@@ -24,33 +24,29 @@ export async function updateDefaultAccount(accountId) {
     if (!userId) throw new Error("Unauthorized");
 
     const user = await db.user.findUnique({
-      where: {
-        clerkUserId: userId,
-      },
+      where: { clerkUserId: userId },
     });
 
     if (!user) {
       throw new Error("User not found");
     }
 
+    // First, unset any existing default account
     await db.account.updateMany({
       where: {
         userId: user.id,
         isDefault: true,
       },
-      data: {
-        isDefault: false,
-      },
+      data: { isDefault: false },
     });
 
+    // Then set the new default account
     const account = await db.account.update({
       where: {
         id: accountId,
         userId: user.id,
       },
-      data: {
-        isDefault: true,
-      },
+      data: { isDefault: true },
     });
 
     revalidatePath("/dashboard");
@@ -58,4 +54,37 @@ export async function updateDefaultAccount(accountId) {
   } catch (error) {
     return { success: false, error: error.message };
   }
+}
+
+export async function getAccountWithTransactions(accountId) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const user = await db.user.findUnique({
+    where: { clerkUserId: userId },
+  });
+
+  if (!user) throw new Error("User not found");
+
+  const account = await db.account.findUnique({
+    where: {
+      id: accountId,
+      userId: user.id,
+    },
+    include: {
+      transactions: {
+        orderBy: { date: "desc" },
+      },
+      _count: {
+        select: { transactions: true },
+      },
+    },
+  });
+
+  if (!account) return null;
+
+  return {
+    ...serializeTransaction(account),
+    transactions: account.transactions.map(serializeTransaction),
+  };
 }
