@@ -27,6 +27,7 @@ import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import ReceiptScanner from "./receipt-scanner";
 
 const AddTransactionForm = ({ accounts, categories }) => {
   const router = useRouter();
@@ -81,9 +82,24 @@ const AddTransactionForm = ({ accounts, categories }) => {
     (category) => category.type === type
   );
 
+  const handleScanComplete = (scannedData) => {
+    // console.log(scannedData);
+    if (scannedData) {
+      setValue("amount", scannedData.amount.toString());
+      setValue("date", new Date(scannedData.date));
+      if (scannedData.description) {
+        setValue("description", scannedData.description);
+      }
+      if (scannedData.category) {
+        setValue("category", scannedData.category);
+      }
+    }
+  };
+
   return (
     <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
       {/* AI Recipt Scanner */}
+      <ReceiptScanner onScanComplete={handleScanComplete} />
 
       <div className="space-y-2">
         <label className="text-sm font-medium">Type</label>
@@ -123,8 +139,8 @@ const AddTransactionForm = ({ accounts, categories }) => {
         <div className="space-y-2">
           <label className="text-sm font-medium">Account</label>
           <Select
-            onValueChange={(value) => setValue("accoundId", value)}
-            defaultValue={getValues("accoundId")}
+            onValueChange={(value) => setValue("accountId", value)}
+            defaultValue={getValues("accountId")}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select account" />
@@ -156,7 +172,7 @@ const AddTransactionForm = ({ accounts, categories }) => {
         <label className="text-sm font-medium">Category</label>
         <Select
           onValueChange={(value) => setValue("category", value)}
-          defaultValue={getValues(category)}
+          defaultValue={getValues("category")}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select category" />
@@ -237,7 +253,7 @@ const AddTransactionForm = ({ accounts, categories }) => {
           <label className="text-sm font-medium">Recurring Interval</label>
           <Select
             onValueChange={(value) => setValue("recurringInterval", value)}
-            defaultValue={getValues(recurringInterval)}
+            defaultValue={getValues("recurringInterval")}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select Interval" />
@@ -262,12 +278,12 @@ const AddTransactionForm = ({ accounts, categories }) => {
         <Button
           type="button"
           variant="outline"
-          className="w-full"
+          className="flex-1"
           onClick={() => router.back()}
         >
           Cancel
         </Button>
-        <Button type="submit" className="w-full" disabled={transactionLoading}>
+        <Button type="submit" className="flex-1" disabled={transactionLoading}>
           Create Transaction
         </Button>
       </div>
