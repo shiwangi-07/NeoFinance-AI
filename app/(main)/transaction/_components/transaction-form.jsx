@@ -48,8 +48,13 @@ const AddTransactionForm = ({ accounts, categories }) => {
       accountId: accounts.find((ac) => ac.isDefault)?.id,
       date: new Date(),
       isRecurring: false,
+      // recurringInterval: undefined,
     },
   });
+
+  useEffect(() => {
+    register("recurringInterval"); // ✅ Register the field so RHF tracks it
+  }, [register]);
 
   const {
     loading: transactionLoading,
@@ -238,9 +243,9 @@ const AddTransactionForm = ({ accounts, categories }) => {
             Recurring Transaction
           </label>
 
-          <p className="text-sm text-muted-foreground">
+          <div className="text-sm text-muted-foreground">
             Set up a recurring schedule for this transaction{" "}
-          </p>
+          </div>
         </div>
         <Switch
           checked={isRecurring}
